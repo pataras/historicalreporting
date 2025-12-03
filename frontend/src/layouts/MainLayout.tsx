@@ -20,6 +20,7 @@ import {
   Dashboard as DashboardIcon,
   Assessment as ReportsIcon,
   Settings as SettingsIcon,
+  Build as SetupIcon,
 } from '@mui/icons-material';
 import { useHealth } from '../hooks/useHealth';
 
@@ -28,6 +29,7 @@ const drawerWidth = 240;
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Reports', icon: <ReportsIcon />, path: '/reports' },
+  { text: 'Setup', icon: <SetupIcon />, path: '/setup' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 

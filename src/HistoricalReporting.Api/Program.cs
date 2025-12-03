@@ -1,3 +1,4 @@
+using HistoricalReporting.Api.Hubs;
 using HistoricalReporting.Core.Interfaces;
 using HistoricalReporting.Core.Services;
 using HistoricalReporting.Infrastructure.Data;
@@ -14,15 +15,20 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new() { Title = "Historical Reporting API", Version = "v1" });
 });
 
+// SignalR
+builder.Services.AddSignalR();
+
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Core Services
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IDataSeedService, DataSeedService>();
 
 // Repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IDataSeedRepository, DataSeedRepository>();
 
 // CORS for frontend
 builder.Services.AddCors(options =>
@@ -38,6 +44,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Auto-migrate database on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -50,5 +63,6 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<SeedProgressHub>("/hubs/seed-progress");
 
 app.Run();

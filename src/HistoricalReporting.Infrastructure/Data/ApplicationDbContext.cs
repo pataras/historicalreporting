@@ -11,6 +11,12 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Report> Reports => Set<Report>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Organisation> Organisations => Set<Organisation>();
+    public DbSet<Department> Departments => Set<Department>();
+    public DbSet<Manager> Managers => Set<Manager>();
+    public DbSet<ManagerDepartment> ManagerDepartments => Set<ManagerDepartment>();
+    public DbSet<OrganisationUser> OrganisationUsers => Set<OrganisationUser>();
+    public DbSet<AuditRecord> AuditRecords => Set<AuditRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,6 +42,84 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
             entity.HasIndex(e => e.Email).IsUnique();
+        });
+
+        // Organisation configuration
+        modelBuilder.Entity<Organisation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(10);
+            entity.HasIndex(e => e.Name).IsUnique();
+        });
+
+        // Department configuration
+        modelBuilder.Entity<Department>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.HasOne(e => e.Organisation)
+                .WithMany(o => o.Departments)
+                .HasForeignKey(e => e.OrganisationId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.ParentDepartment)
+                .WithMany(d => d.SubDepartments)
+                .HasForeignKey(e => e.ParentDepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => new { e.OrganisationId, e.Name }).IsUnique();
+        });
+
+        // Manager configuration
+        modelBuilder.Entity<Manager>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.Organisation)
+                .WithMany(o => o.Managers)
+                .HasForeignKey(e => e.OrganisationId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ManagerDepartment junction table
+        modelBuilder.Entity<ManagerDepartment>(entity =>
+        {
+            entity.HasKey(e => new { e.ManagerId, e.DepartmentId });
+            entity.HasOne(e => e.Manager)
+                .WithMany(m => m.ManagedDepartments)
+                .HasForeignKey(e => e.ManagerId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Department)
+                .WithMany(d => d.ManagerDepartments)
+                .HasForeignKey(e => e.DepartmentId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // OrganisationUser configuration
+        modelBuilder.Entity<OrganisationUser>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasOne(e => e.Organisation)
+                .WithMany(o => o.Users)
+                .HasForeignKey(e => e.OrganisationId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Department)
+                .WithMany(d => d.Users)
+                .HasForeignKey(e => e.DepartmentId)
+                .OnDelete(DeleteBehavior.NoAction);
+            entity.HasIndex(e => e.OrganisationId);
+            entity.HasIndex(e => e.DepartmentId);
+        });
+
+        // AuditRecord configuration
+        modelBuilder.Entity<AuditRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.AuditRecords)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.Date);
+            entity.HasIndex(e => e.Status);
         });
     }
 
