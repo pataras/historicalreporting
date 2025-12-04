@@ -9,5 +9,9 @@ public class User : BaseEntity
     public bool IsActive { get; set; } = true;
     public DateTime? LastLoginAt { get; set; }
 
+    // Link to Manager role (if this user is a manager)
+    public Guid? ManagerId { get; set; }
+    public Manager? Manager { get; set; }
+
     public string FullName => $"{FirstName} {LastName}";
 }

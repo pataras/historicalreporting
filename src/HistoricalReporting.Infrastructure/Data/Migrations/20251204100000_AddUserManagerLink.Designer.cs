@@ -4,6 +4,7 @@ using HistoricalReporting.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HistoricalReporting.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251204100000_AddUserManagerLink")]
+    partial class AddUserManagerLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,15 +393,6 @@ namespace HistoricalReporting.Infrastructure.Data.Migrations
                     b.Navigation("Organisation");
                 });
 
-            modelBuilder.Entity("HistoricalReporting.Core.Entities.Department", b =>
-                {
-                    b.Navigation("ManagerDepartments");
-
-                    b.Navigation("SubDepartments");
-
-                    b.Navigation("Users");
-                });
-
             modelBuilder.Entity("HistoricalReporting.Core.Entities.User", b =>
                 {
                     b.HasOne("HistoricalReporting.Core.Entities.Manager", "Manager")
@@ -407,6 +401,15 @@ namespace HistoricalReporting.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Manager");
+                });
+
+            modelBuilder.Entity("HistoricalReporting.Core.Entities.Department", b =>
+                {
+                    b.Navigation("ManagerDepartments");
+
+                    b.Navigation("SubDepartments");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("HistoricalReporting.Core.Entities.Manager", b =>

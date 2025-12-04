@@ -7,6 +7,7 @@ namespace HistoricalReporting.Core.Services;
 public class DataSeedService : IDataSeedService
 {
     private readonly IDataSeedRepository _repository;
+    private readonly IAuthService _authService;
     private readonly Random _random = new();
 
     private static readonly string[] OrganisationNames =
@@ -38,9 +39,10 @@ public class DataSeedService : IDataSeedService
         "Cloud Services", "Mobile Development", "Platform Engineering", "Site Reliability", "Data Engineering"
     ];
 
-    public DataSeedService(IDataSeedRepository repository)
+    public DataSeedService(IDataSeedRepository repository, IAuthService authService)
     {
         _repository = repository;
+        _authService = authService;
     }
 
     public async Task SeedDataAsync(Func<SeedProgress, Task> progressCallback, CancellationToken cancellationToken = default)
@@ -255,6 +257,51 @@ public class DataSeedService : IDataSeedService
             await _repository.AddManagersAsync(allManagers, cancellationToken);
             await _repository.AddManagerDepartmentsAsync(managerDepartments, cancellationToken);
 
+            // Stage 4b: Create login accounts for managers
+            await progressCallback(new SeedProgress
+            {
+                Stage = "Manager Accounts",
+                Message = "Creating manager login accounts...",
+                CurrentItem = 0,
+                TotalItems = totalManagers,
+                PercentComplete = CalculateOverallProgress(4, 7, 0.5)
+            });
+
+            var loginUsers = new List<User>();
+            int loginUserIndex = 0;
+            foreach (var org in organisations)
+            {
+                var orgManagers = allManagers.Where(m => m.OrganisationId == org.Id).ToList();
+                for (int i = 0; i < orgManagers.Count; i++)
+                {
+                    var manager = orgManagers[i];
+                    var email = $"manager{i + 1}@{org.Name.ToLower()}.com";
+                    var loginUser = new User
+                    {
+                        Id = Guid.NewGuid(),
+                        Email = email,
+                        PasswordHash = _authService.HashPassword("password123"),
+                        FirstName = $"Manager",
+                        LastName = $"{i + 1}",
+                        IsActive = true,
+                        ManagerId = manager.Id
+                    };
+                    loginUsers.Add(loginUser);
+                    loginUserIndex++;
+                }
+            }
+
+            await _repository.AddLoginUsersAsync(loginUsers, cancellationToken);
+
+            await progressCallback(new SeedProgress
+            {
+                Stage = "Manager Accounts",
+                Message = $"Created {loginUsers.Count} manager login accounts",
+                CurrentItem = loginUsers.Count,
+                TotalItems = totalManagers,
+                PercentComplete = CalculateOverallProgress(4, 7, 1.0)
+            });
+
             // Stage 5: Create Users
             await progressCallback(new SeedProgress
             {
@@ -262,7 +309,7 @@ public class DataSeedService : IDataSeedService
                 Message = "Creating users...",
                 CurrentItem = 0,
                 TotalItems = totalUsers,
-                PercentComplete = CalculateOverallProgress(5, 6, 0)
+                PercentComplete = CalculateOverallProgress(5, 7, 0)
             });
 
             var allUsers = new List<OrganisationUser>();
@@ -300,7 +347,7 @@ public class DataSeedService : IDataSeedService
                             Message = $"Created {userProgress} of {totalUsers} users",
                             CurrentItem = userProgress,
                             TotalItems = totalUsers,
-                            PercentComplete = CalculateOverallProgress(5, 6, (double)userProgress / totalUsers)
+                            PercentComplete = CalculateOverallProgress(5, 7, (double)userProgress / totalUsers)
                         });
                     }
                 }
@@ -314,7 +361,7 @@ public class DataSeedService : IDataSeedService
                         Message = $"Created {userProgress} of {totalUsers} users",
                         CurrentItem = userProgress,
                         TotalItems = totalUsers,
-                        PercentComplete = CalculateOverallProgress(5, 6, (double)userProgress / totalUsers)
+                        PercentComplete = CalculateOverallProgress(5, 7, (double)userProgress / totalUsers)
                     });
                 }
             }
@@ -326,7 +373,7 @@ public class DataSeedService : IDataSeedService
                 Message = "Creating audit records...",
                 CurrentItem = 0,
                 TotalItems = estimatedAuditRecords,
-                PercentComplete = CalculateOverallProgress(6, 6, 0)
+                PercentComplete = CalculateOverallProgress(6, 7, 0)
             });
 
             int auditProgress = 0;
@@ -369,7 +416,7 @@ public class DataSeedService : IDataSeedService
                         Message = $"Created audit records for {auditProgress} of {totalUsers} users ({totalAuditRecords} records)",
                         CurrentItem = totalAuditRecords,
                         TotalItems = estimatedAuditRecords,
-                        PercentComplete = CalculateOverallProgress(6, 6, (double)auditProgress / totalUsers)
+                        PercentComplete = CalculateOverallProgress(6, 7, (double)auditProgress / totalUsers)
                     });
                 }
             }
@@ -382,7 +429,7 @@ public class DataSeedService : IDataSeedService
             await progressCallback(new SeedProgress
             {
                 Stage = "Complete",
-                Message = $"Seeding complete! Created {totalOrgs} organisations, {totalDepartments} departments, {totalManagers} managers, {totalUsers} users, and {totalAuditRecords} audit records.",
+                Message = $"Seeding complete! Created {totalOrgs} organisations, {totalDepartments} departments, {totalManagers} managers with login accounts (password: password123), {totalUsers} users, and {totalAuditRecords} audit records.",
                 CurrentItem = totalAuditRecords,
                 TotalItems = totalAuditRecords,
                 PercentComplete = 100,
