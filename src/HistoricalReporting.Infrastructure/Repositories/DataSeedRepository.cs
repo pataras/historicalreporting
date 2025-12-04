@@ -57,6 +57,12 @@ public class DataSeedRepository : IDataSeedRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task AddLoginUsersAsync(IEnumerable<User> users, CancellationToken cancellationToken = default)
+    {
+        _context.Users.AddRange(users);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task AddAuditRecordsAsync(IEnumerable<AuditRecord> records, CancellationToken cancellationToken = default)
     {
         _context.AuditRecords.AddRange(records);
@@ -68,6 +74,7 @@ public class DataSeedRepository : IDataSeedRepository
         // Clear in correct order to respect foreign keys
         await _context.AuditRecords.ExecuteDeleteAsync(cancellationToken);
         await _context.OrganisationUsers.ExecuteDeleteAsync(cancellationToken);
+        await _context.Users.ExecuteDeleteAsync(cancellationToken);
         await _context.ManagerDepartments.ExecuteDeleteAsync(cancellationToken);
         await _context.Managers.ExecuteDeleteAsync(cancellationToken);
 

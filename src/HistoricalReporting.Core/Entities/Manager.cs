@@ -8,4 +8,7 @@ public class Manager : BaseEntity
     public bool ManagesAllDepartments { get; set; }
 
     public ICollection<ManagerDepartment> ManagedDepartments { get; set; } = [];
+
+    // The user account associated with this manager role
+    public User? User { get; set; }
 }
