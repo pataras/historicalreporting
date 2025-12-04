@@ -3,6 +3,7 @@ using HistoricalReporting.Core.Interfaces;
 using HistoricalReporting.Core.Services;
 using HistoricalReporting.Infrastructure.Data;
 using HistoricalReporting.Infrastructure.Repositories;
+using HistoricalReporting.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Core Services
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IDataSeedService, DataSeedService>();
+builder.Services.AddScoped<IUserStatusReportService, UserStatusReportService>();
 
 // Repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

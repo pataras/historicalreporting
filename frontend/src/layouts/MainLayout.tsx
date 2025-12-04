@@ -21,6 +21,7 @@ import {
   Assessment as ReportsIcon,
   Settings as SettingsIcon,
   Build as SetupIcon,
+  People as PeopleIcon,
 } from '@mui/icons-material';
 import { useHealth } from '../hooks/useHealth';
 
@@ -29,6 +30,7 @@ const drawerWidth = 240;
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Reports', icon: <ReportsIcon />, path: '/reports' },
+  { text: 'User Status', icon: <PeopleIcon />, path: '/user-status-report' },
   { text: 'Setup', icon: <SetupIcon />, path: '/setup' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
