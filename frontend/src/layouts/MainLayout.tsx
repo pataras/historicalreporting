@@ -22,6 +22,7 @@ import {
   Settings as SettingsIcon,
   Build as SetupIcon,
   People as PeopleIcon,
+  Psychology as QueryIcon,
 } from '@mui/icons-material';
 import { useHealth } from '../hooks/useHealth';
 
@@ -31,6 +32,7 @@ const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Reports', icon: <ReportsIcon />, path: '/reports' },
   { text: 'User Status', icon: <PeopleIcon />, path: '/user-status-report' },
+  { text: 'Query Assistant', icon: <QueryIcon />, path: '/query-assistant' },
   { text: 'Setup', icon: <SetupIcon />, path: '/setup' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];

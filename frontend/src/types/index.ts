@@ -61,3 +61,33 @@ export interface Manager {
   managesAllDepartments: boolean;
   managedDepartments: Department[];
 }
+
+export interface NlpQueryRequest {
+  query: string;
+}
+
+export interface NlpQueryResponse {
+  success: boolean;
+  naturalLanguageQuery?: string;
+  generatedSql?: string;
+  explanation?: string;
+  warnings: string[];
+  results: Record<string, unknown>[];
+  columns: string[];
+  totalRows: number;
+  wasTruncated: boolean;
+  executionTimeMs: number;
+  clarificationNeeded: boolean;
+  clarificationMessage?: string;
+  error?: string;
+}
+
+export interface NlpQueryHistoryItem {
+  id: string;
+  managerId: string;
+  query: string;
+  generatedSql?: string;
+  success: boolean;
+  resultCount: number;
+  executedAt: string;
+}

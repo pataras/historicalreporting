@@ -5,6 +5,8 @@ using HistoricalReporting.Core.Services;
 using HistoricalReporting.Infrastructure.Data;
 using HistoricalReporting.Infrastructure.Repositories;
 using HistoricalReporting.Infrastructure.Services;
+using HistoricalReporting.AI;
+using HistoricalReporting.Api.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -94,6 +96,9 @@ builder.Services.AddScoped<IRowLevelSecurityService, RowLevelSecurityService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IDataSeedRepository, DataSeedRepository>();
 
+// NLP Query Services (AI-powered natural language database queries)
+builder.Services.AddNlpQueryServices(builder.Configuration);
+
 // CORS for frontend
 builder.Services.AddCors(options =>
 {
@@ -126,6 +131,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseNlpQueryRateLimiting();
 app.MapControllers();
 app.MapHub<SeedProgressHub>("/hubs/seed-progress");
 

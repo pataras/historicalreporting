@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ManagerDepartment> ManagerDepartments => Set<ManagerDepartment>();
     public DbSet<OrganisationUser> OrganisationUsers => Set<OrganisationUser>();
     public DbSet<AuditRecord> AuditRecords => Set<AuditRecord>();
+    public DbSet<NlpQueryLog> NlpQueryLogs => Set<NlpQueryLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -124,6 +125,25 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Date);
             entity.HasIndex(e => e.Status);
+        });
+
+        // NlpQueryLog configuration
+        modelBuilder.Entity<NlpQueryLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.NaturalLanguageQuery).IsRequired().HasMaxLength(2000);
+            entity.Property(e => e.GeneratedSql).HasMaxLength(8000);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
+            entity.HasOne(e => e.Manager)
+                .WithMany()
+                .HasForeignKey(e => e.ManagerId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Organisation)
+                .WithMany()
+                .HasForeignKey(e => e.OrganisationId)
+                .OnDelete(DeleteBehavior.NoAction);
+            entity.HasIndex(e => e.ManagerId);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 

@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HistoricalReporting.Core\HistoricalReporting.Core.csproj" />
     <ProjectReference Include="..\HistoricalReporting.Infrastructure\HistoricalReporting.Infrastructure.csproj" />
+    <ProjectReference Include="..\HistoricalReporting.AI\HistoricalReporting.AI.csproj" />
   </ItemGroup>
 
 </Project>
