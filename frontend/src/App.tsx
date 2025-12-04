@@ -7,6 +7,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Reports } from './pages/Reports';
 import { Settings } from './pages/Settings';
 import { Setup } from './pages/Setup';
+import { UserStatusReport } from './pages/UserStatusReport';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ function App() {
             <Route path="/" element={<MainLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="user-status-report" element={<UserStatusReport />} />
               <Route path="setup" element={<Setup />} />
               <Route path="settings" element={<Settings />} />
             </Route>

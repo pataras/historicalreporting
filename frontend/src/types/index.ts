@@ -28,3 +28,22 @@ export interface ApiError {
   message: string;
   status: number;
 }
+
+export interface MonthlyUserStatus {
+  year: number;
+  month: number;
+  validCount: number;
+  invalidCount: number;
+  totalCount: number;
+}
+
+export interface MonthlyUserStatusReportResult {
+  organisationId: string;
+  organisationName: string;
+  monthlyData: MonthlyUserStatus[];
+}
+
+export interface Organisation {
+  id: string;
+  name: string;
+}
