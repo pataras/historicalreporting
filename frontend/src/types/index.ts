@@ -40,10 +40,24 @@ export interface MonthlyUserStatus {
 export interface MonthlyUserStatusReportResult {
   organisationId: string;
   organisationName: string;
+  managerId?: string;
+  managerName?: string;
   monthlyData: MonthlyUserStatus[];
 }
 
 export interface Organisation {
   id: string;
   name: string;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+}
+
+export interface Manager {
+  id: string;
+  name: string;
+  managesAllDepartments: boolean;
+  managedDepartments: Department[];
 }

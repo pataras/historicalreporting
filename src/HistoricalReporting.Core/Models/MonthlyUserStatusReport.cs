@@ -13,5 +13,7 @@ public class MonthlyUserStatusReportResult
 {
     public Guid OrganisationId { get; set; }
     public string OrganisationName { get; set; } = string.Empty;
+    public Guid? ManagerId { get; set; }
+    public string? ManagerName { get; set; }
     public List<MonthlyUserStatusReport> MonthlyData { get; set; } = [];
 }

@@ -32,4 +32,21 @@ public class UserStatusReportsController : ControllerBase
 
         return Ok(report);
     }
+
+    [HttpGet("monthly/{organisationId:guid}/manager/{managerId:guid}")]
+    public async Task<IActionResult> GetMonthlyUserStatusReportByManager(Guid organisationId, Guid managerId)
+    {
+        _logger.LogInformation(
+            "Getting monthly user status report for organisation {OrganisationId} and manager {ManagerId}",
+            organisationId, managerId);
+
+        var report = await _userStatusReportService.GetMonthlyUserStatusReportByManagerAsync(organisationId, managerId);
+
+        if (report == null)
+        {
+            return NotFound($"Organisation with ID {organisationId} or Manager with ID {managerId} not found");
+        }
+
+        return Ok(report);
+    }
 }
