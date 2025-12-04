@@ -44,11 +44,11 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Auto-migrate database on startup
+// Apply pending migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.EnsureCreated();
+    dbContext.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline
