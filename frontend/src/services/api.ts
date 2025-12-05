@@ -1,7 +1,25 @@
 const API_BASE_URL = '/api';
+const TOKEN_KEY = 'auth_token';
+
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
+    if (response.status === 401) {
+      // Clear auth and redirect to login on 401
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem('auth_user');
+      window.location.href = '/login';
+    }
     const error = await response.text();
     throw new Error(error || `HTTP error! status: ${response.status}`);
   }
@@ -12,9 +30,7 @@ export const api = {
   get: async <T>(endpoint: string): Promise<T> => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
     });
     return handleResponse<T>(response);
   },
@@ -22,9 +38,7 @@ export const api = {
   post: async <T>(endpoint: string, data: unknown): Promise<T> => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     return handleResponse<T>(response);
@@ -33,9 +47,7 @@ export const api = {
   put: async <T>(endpoint: string, data: unknown): Promise<T> => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
     return handleResponse<T>(response);
@@ -44,9 +56,7 @@ export const api = {
   delete: async <T>(endpoint: string): Promise<T> => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
     });
     return handleResponse<T>(response);
   },

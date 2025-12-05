@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Box,
+  Button,
   CssBaseline,
   Drawer,
   IconButton,
@@ -23,8 +24,10 @@ import {
   Build as SetupIcon,
   People as PeopleIcon,
   Psychology as QueryIcon,
+  Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useHealth } from '../hooks/useHealth';
+import { useAuth } from '../contexts/AuthContext';
 
 const drawerWidth = 240;
 
@@ -42,6 +45,12 @@ export function MainLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: health, isError } = useHealth();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -97,7 +106,21 @@ export function MainLayout() {
             label={isError ? 'API Offline' : `API ${health?.status || 'Checking...'}`}
             color={isError ? 'error' : health?.status === 'Healthy' ? 'success' : 'warning'}
             size="small"
+            sx={{ mr: 2 }}
           />
+          {user && (
+            <Typography variant="body2" sx={{ mr: 2 }}>
+              {user.firstName} {user.lastName}
+            </Typography>
+          )}
+          <Button
+            color="inherit"
+            startIcon={<LogoutIcon />}
+            onClick={handleLogout}
+            size="small"
+          >
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
       <Box
